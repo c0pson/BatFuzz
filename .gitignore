@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# VS Code settings
+.vscode/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+MANIFEST
+
+# PyInstaller
+*.spec
+
+# Virtual environments
+venv/
+.env/
+ENV/
+env/
+.venv/
+
+# Test / coverage tools
+.coverage
+.cache
+.nox/
+.tox/
+.pytest_cache/
+coverage.xml
+htmlcov/
+
+# Type checker
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# macOS files
+.DS_Store
+
+# Others
+*.log
