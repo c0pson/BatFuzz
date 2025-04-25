@@ -1,2 +1,1 @@
-"""_summary_
-"""
+from .example_fuzz import fuzz
