@@ -16,6 +16,7 @@ def generate_arg(type: type) -> Any:
     """
     if type == int:
         return random.randrange(SIZE.MIN_INT, SIZE.MAX_INT)
+    raise ValueError(f'No implementation for type: {type}')
 
 def fuzz(*types: type, **kwargs) -> Callable:
     """Decorator for fuzz testing a function by repeatedly calling it with randomly 
