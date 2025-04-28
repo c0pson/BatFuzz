@@ -9,5 +9,5 @@ class SIZE(IntEnum):
         MAX_INT (int): The maximum integer value supported by the platform.
         MIN_INT (int): The minimum integer value, equal to -sys.maxsize - 1.
     """
-    MAX_INT = maxsize
-    MIN_INT = -maxsize - 1
+    MAX_INT = 100
+    MIN_INT = 0
