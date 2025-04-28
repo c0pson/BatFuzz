@@ -1,7 +1,8 @@
 from typing import Callable, Any
 import random
 
-from .values import SIZE
+from .enums import SIZE
+from .generator import GeneticGenerator
 
 def generate_arg(type: type) -> Any:
     """Function creating random argument based on the type.
@@ -33,6 +34,7 @@ def fuzz(*types: type, **kwargs) -> Callable:
     iterations: int = 100_000_000 if 'iterations' not in kwargs else (kwargs['iterations'] if isinstance(kwargs['iterations'], int) else 100_000_000)
     def decorator(f: Callable):
         def wrapper(*args, **kwargs):
+            generation = GeneticGenerator() # here the GeneticGenerator will be used
             for _ in range(iterations):
                 generated_args = [generate_arg(type) for type in types]
                 try:
@@ -41,6 +43,7 @@ def fuzz(*types: type, **kwargs) -> Callable:
                     # in general don't use general Exception as its bad practice
                     # but in this case its unavoidable as we dont know how the passed function might misbehave
                     print(f'Failed with argument(s): ({', '.join(generated_args)}); which raised: {e}')
+                # generation.next_gen() # will be used after implementation
             print(f'Fuzzing of function "{f.__name__}" completed.')
         print(f'Fuzzing of function "{f.__name__}" started.')
         return wrapper
