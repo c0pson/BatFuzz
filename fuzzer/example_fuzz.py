@@ -43,7 +43,7 @@ def fuzz(*types: type, **kwargs) -> Callable:
                     # in general don't use general Exception as its bad practice
                     # but in this case its unavoidable as we dont know how the passed function might misbehave
                     args_as_str = ', '.join(str(arg) for arg in generated_args)
-                    print(f'Failed with argument(s): ({', '.join(args_as_str)}); which raised: {e}')
+                    print(f'Failed with argument(s): ({args_as_str}); which raised: {e}')
                 # generation.next_gen() # will be used after implementation
             print(f'Fuzzing of function "{f.__name__}" completed.')
         print(f'Fuzzing of function "{f.__name__}" started.')
