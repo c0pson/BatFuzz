@@ -1,6 +1,6 @@
 import pytest
 
-from fuzzer import fuzz
+from fuzzer_example import fuzz
 
 def test_fuzz_decorator():
     call_counter = {'count': 0}

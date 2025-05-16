@@ -1,4 +1,4 @@
-from fuzzer import fuzz
+from fuzzer_example import fuzz
 
 @fuzz(int, int, iterations=10_000_000)
 def test_func(a: int, b: int) -> float:
