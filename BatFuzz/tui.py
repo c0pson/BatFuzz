@@ -1,6 +1,6 @@
 from __future__ import annotations
 from datetime import datetime
-import itertools
+from typing import Any, List, Optional
 
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal
@@ -23,18 +23,21 @@ class BatFuzz(App):
 
         #main-grid { layout: horizontal; height: 1fr; }
         #notif     { width: 50%; overflow-y: scroll; }
-        #sys       { width: 15%; }
-        #unique    { width: 35%; }
+        #sys       { width: 20%; }
+        #unique    { width: 30%; }
 
         Footer { dock: bottom; }
     """
-    BINDINGS = [("q", "quit", "Quit"), ("r", "reset", "Reset")]
+    BINDINGS = [("q", "quit", "Quit")]
 
-    FAKE_BUG_TYPES = [
-        "NullPointer", "BufferOverflow", "RaceCondition", "UseAfterFree",
-        "IntegerOverflow", "OffByOne", "MemoryLeak", "StackSmash",
-        "UncaughtException", "Segfault"
-    ]
+    loading_bar: LoadingBar
+    gen_box: GenTimeBox
+    notif: NotificationPanel
+    sys_stats: SysStatsPanel
+    unique_panel: UniqueBugsPanel
+    found_bugs: List[str]
+    ga_controller: Optional[Any] = None
+    ga_observer: Optional[Any] = None
 
     def compose(self) -> ComposeResult:
         yield Banner(id="banner")
@@ -52,45 +55,27 @@ class BatFuzz(App):
             yield self.unique_panel
         yield Footer()
 
-    def fake_stats(self):
-        while True:
-            for gen in itertools.count(1):
-                yield gen
-
     def on_mount(self) -> None:
         self.start_time = datetime.now()
-        self._fake_iter = self.fake_stats()
-        self.found_bugs: list = []
-        self.refresh_count = 0
-        self.set_interval(0.2, self.refresh_stats)
-
-    def refresh_stats(self) -> None:
-        now = datetime.now()
-        pct = ((now - self.start_time).total_seconds() % 10) / 10
-        self.loading_bar.progress = pct
-
-        self.gen_box.gen = int(pct * 100)
-        self.gen_box.elapsed = now - self.start_time
-
-        self.sys_stats.stats = {
-            "RAM": "3.1 GB / 8 GB",
-            "CPU": "42 %",
-            "GPU": "N/A",
-        }
-        self.refresh_count += 1
-        if self.refresh_count % 10 == 0:
-            if len(self.found_bugs) < len(self.FAKE_BUG_TYPES):
-                next_bug = self.FAKE_BUG_TYPES[len(self.found_bugs)]
-                self.found_bugs.append(next_bug)
-                self.notif.add(f"[{self.gen_box.gen}] new bug found: {next_bug}")
-                self.unique_panel.bugs = list(self.found_bugs)  # Force reactivity
-
-    def action_reset(self) -> None:
-        self.start_time = datetime.now()
-        self._fake_iter = self.fake_stats()
-        self.notif.update("")
         self.found_bugs = []
-        self.unique_panel.bugs = []
+        if self.ga_controller:
+            self.gen_box.target_gen = self.ga_controller._target_generation
+            self.run_controller()
 
-def run() -> None:
-    BatFuzz().run()
+    def setup_ga(self, fuzzable: Any, arguments: Any, generations: int) -> None:
+        """Setup the GA controller and observer manually (if not using decorator)"""
+        from .ga_controller import GAController
+        from .observer import TUIObserver
+        
+        self.ga_controller = GAController(fuzzable, arguments, generations)
+        self.ga_observer = TUIObserver(self)
+        self.ga_controller.add_observer(self.ga_observer)
+
+    def run_controller(self) -> None:
+        """Run the GA controller in a separate thread"""
+        import threading
+        
+        if self.ga_controller:
+            thread = threading.Thread(target=self.ga_controller.run)
+            thread.daemon = True
+            thread.start()

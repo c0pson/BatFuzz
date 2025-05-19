@@ -24,48 +24,39 @@ class Banner(Widget):
 """
         return Align.center(Text(ascii_logo, style="bold cyan"))
 
-"""
-   /\                 /\
-  / \'._   (\_/)   _.'/ \
- /_.''._'--('.')--'_.''._\
- | \_ / `;=/ " \=;` \ _/ |
-  \/ `\__|`\___/`|__/`  \/
-jgs`      \(/|\)/       `
-           " ` "
-"""
-
 class LoadingBar(Widget):
     progress = reactive(0.0)
     PROG = Progress(
-        TextColumn("LOADING"),
+        TextColumn("[bold]Generation Progress:"),
         BarColumn(bar_width=None, style="cyan"),
         TextColumn("{task.percentage:>3.0f}%"),
         expand=True,
-        transient=True,
     )
-    _tid = PROG.add_task("boot", total=100)
+    _tid = PROG.add_task("fuzzing", total=100)
 
     def render(self) -> RenderableType:
         self.PROG.update(self._tid, completed=self.progress * 100)
         return Panel(
             self.PROG,
-            title="",
+            title="Fuzzing Progress",
             border_style="cyan",
             padding=(0, 1),
             height=3,
         )
 
 class GenTimeBox(Static):
-    gen     = reactive(0)
+    gen = reactive(0)
+    target_gen = reactive(0)
     elapsed = reactive(timedelta())
 
     def render(self) -> RenderableType:
-        txt = Text(f"GEN #{self.gen}\nTIME {self.elapsed}", justify="center")
+        progress_percentage = (self.gen / self.target_gen * 100) if self.target_gen > 0 else 0
+        txt = Text(f"GEN {self.gen}/{self.target_gen} ({progress_percentage:.1f}%)\nTIME {self.elapsed}", justify="center")
         return Panel(txt, border_style="cyan", height=3)
 
 class NotificationPanel(Static):
     def add(self, msg: str) -> None:
-        lines = (self.renderable.plain.splitlines() if self.renderable else [])[-200:]
+        lines = (self.renderable.plain.splitlines() if self.renderable else [])[-200:]  # type: ignore
         lines.append(msg)
         self.update(Text("\n".join(lines), style="white"))
 
@@ -76,14 +67,14 @@ class SysStatsPanel(Widget):
         table = Table.grid(padding=(0, 1))
         for k, v in self.stats.items():
             table.add_row(Text(k, style="bold"), Text(v))
-        return Panel(table, title="RAM / CPU / GPU", border_style="cyan")
+        return Panel(table, title="SYSTEM RESOURCES", border_style="cyan")
 
 class UniqueBugsPanel(Widget):
     bugs: reactive[List[str]] = reactive([])
 
     def render(self) -> RenderableType:
         if not self.bugs:
-            txt = Text("No bugs found.", style="dim", justify="center")
+            txt = Text("No bugs found yet.", style="dim", justify="center")
         else:
             txt = Text("\n".join(self.bugs), style="bold red", justify="left")
         return Panel(txt, title="UNIQUE bugs", border_style="cyan")

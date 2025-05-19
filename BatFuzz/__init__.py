@@ -1,1 +1,1 @@
-from .tui import BatFuzz
+from .fuzz import fuzz

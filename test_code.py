@@ -1,7 +1,8 @@
-from fuzzer_example import fuzz
+from BatFuzz import fuzz
+import random
 
-@fuzz(int, int, iterations=10_000_000)
-def test_func(a: int, b: int) -> float:
+@fuzz(generations=100)
+def test_func() -> None:
     """Function with unintended behavior with test purpose.
 
     Args:
@@ -11,7 +12,8 @@ def test_func(a: int, b: int) -> float:
     Returns:
         float: a divided by b
     """
-    return a / b
+    if random.randrange(1,10) == 3:
+        raise ZeroDivisionError
 
 if __name__ == "__main__":
-    test_func(...)
+    test_func()
