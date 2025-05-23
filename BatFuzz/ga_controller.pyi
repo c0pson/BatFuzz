@@ -2,14 +2,14 @@ from .type_defs import Fuzzable, FuzzableArguments
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .observer import TUIObserver
+    from .observer import Observer
 
 class GAController:
     def __init__(self, fuzz_target: Fuzzable, arguments: FuzzableArguments, target_generation: int) -> None: ...
 
     def notify(self, event: str, data: dict) -> None: ...
 
-    def add_observer(self, observer: 'TUIObserver') -> None: ...
+    def add_observer(self, observer: 'Observer') -> None: ...
 
     def mutate_all(self) -> None: ...
 
