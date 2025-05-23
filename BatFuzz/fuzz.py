@@ -1,10 +1,8 @@
-from typing import Callable, TypeVar, Any
-from .type_defs import DEFAULT
+from typing import Callable
+from .type_defs import DEFAULT, T
 from .ga_controller import GAController
 from .observer import TUIObserver, LoggingObserver
 from .tui import BatFuzz
-
-T = TypeVar('T')
 
 def fuzz(*types: type, **kwargs) -> Callable[[Callable[..., T]], Callable[..., T]]:
     generations: int = kwargs.get('generations', DEFAULT.GENERATIONS)
