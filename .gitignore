@@ -48,3 +48,4 @@ htmlcov/
 # Others
 *.log
 documents
+batfuzz_logs
